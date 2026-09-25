@@ -1,0 +1,69 @@
+<div class="form-card">
+  <h2 class="form-title">Join EventDesk Platform</h2>
+
+  <% if (errors && errors.length > 0) { %>
+    <div class="alert alert-error">
+      <div>
+        <% errors.forEach(function(err) { %>
+          <div>• <%= err %></div>
+        <% }); %>
+      </div>
+    </div>
+  <% } %>
+
+  <form action="/auth/register" method="POST">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+    <div class="form-group">
+      <label class="form-label" for="name">Full Name *</label>
+      <input 
+        type="text" 
+        id="name" 
+        name="name" 
+        class="form-input" 
+        placeholder="Jane Doe" 
+        value="<%= values.name || '' %>" 
+        required
+      >
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="email">Email Address *</label>
+      <input 
+        type="email" 
+        id="email" 
+        name="email" 
+        class="form-input" 
+        placeholder="jane@example.com" 
+        value="<%= values.email || '' %>" 
+        required
+      >
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="password">Password (Min: 8 chars) *</label>
+      <input 
+        type="password" 
+        id="password" 
+        name="password" 
+        class="form-input" 
+        placeholder="••••••••" 
+        required
+      >
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="role">Account Role *</label>
+      <select id="role" name="role" class="form-select">
+        <option value="attendee" <%= (values.role === 'attendee' || !values.role) ? 'selected' : '' %>>Attendee (Discover & RSVP to events)</option>
+        <option value="organizer" <%= values.role === 'organizer' ? 'selected' : '' %>>Organizer (Create & host events)</option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem; padding: 0.75rem;">Create Account</button>
+  </form>
+
+  <p style="text-align: center; margin-top: 1.5rem; color: var(--text-muted); font-size: 0.9rem;">
+    Already have an account? <a href="/auth/login">Sign In</a>
+  </p>
+</div>

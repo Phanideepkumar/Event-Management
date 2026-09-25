@@ -1,0 +1,47 @@
+<div class="event-card">
+  <div class="card-header">
+    <h3 class="card-title"><%= event.title %></h3>
+    <% if (event.status === 'cancelled') { %>
+      <span class="badge badge-cancelled">Cancelled</span>
+    <% } else if (event.isSoldOut) { %>
+      <span class="badge badge-soldout">Sold Out</span>
+    <% } else { %>
+      <span class="badge badge-published">Open</span>
+    <% } %>
+  </div>
+
+  <div class="card-body">
+    <p class="card-description"><%= event.description || 'No description provided.' %></p>
+    
+    <div class="card-meta">
+      <div class="card-meta-item">
+        <span>📅</span>
+        <span><%= new Date(event.eventDate).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %></span>
+      </div>
+      <div class="card-meta-item">
+        <span>👤</span>
+        <span>Organized by <%= event.organizer ? event.organizer.name : 'Unknown' %></span>
+      </div>
+    </div>
+
+    <div class="capacity-container">
+      <div class="capacity-label">
+        <span>Reserved Seats</span>
+        <span><%= event.confirmedCount %> / <%= event.totalCapacity %></span>
+      </div>
+      <div class="capacity-bar-bg">
+        <div 
+          class="capacity-bar-fill <%= event.isSoldOut ? 'full' : '' %>" 
+          style="width: <%= Math.min(100, Math.round((event.confirmedCount / event.totalCapacity) * 100)) %>%"
+        ></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-footer">
+    <span style="font-size: 0.85rem; color: var(--text-muted);">
+      <%= event.isSoldOut ? 'No spots left' : `${event.spotsLeft} spot${event.spotsLeft === 1 ? '' : 's'} remaining` %>
+    </span>
+    <a href="/events/<%= event.id %>" class="btn btn-secondary btn-sm">View Details →</a>
+  </div>
+</div>

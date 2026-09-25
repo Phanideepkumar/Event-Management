@@ -1,0 +1,19 @@
+<div class="flash-container">
+  <% if (messages.success && messages.success.length > 0) { %>
+    <% messages.success.forEach(function(msg) { %>
+      <div class="alert alert-success">
+        <span>✓</span>
+        <div><%= msg %></div>
+      </div>
+    <% }); %>
+  <% } %>
+
+  <% if (messages.error && messages.error.length > 0) { %>
+    <% messages.error.forEach(function(msg) { %>
+      <div class="alert alert-error">
+        <span>⚠</span>
+        <div><%= msg %></div>
+      </div>
+    <% }); %>
+  <% } %>
+</div>

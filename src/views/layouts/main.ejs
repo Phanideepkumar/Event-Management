@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'EventDesk - Community Ticketing & RSVP' %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('../partials/navbar') %>
+
+  <main class="main-content">
+    <div class="container">
+      <%- include('../partials/flash') %>
+      <%- body %>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2026 EventDesk Architecture Platform. High-Concurrency Multi-Tenant Ticketing Engine.</p>
+    </div>
+  </footer>
+</body>
+</html>

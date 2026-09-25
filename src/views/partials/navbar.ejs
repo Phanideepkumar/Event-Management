@@ -1,0 +1,43 @@
+<nav class="navbar">
+  <div class="container navbar-inner">
+    <a href="/events" class="brand">
+      <div class="brand-icon">E</div>
+      <span class="brand-text">EventDesk</span>
+    </a>
+
+    <ul class="nav-links">
+      <li>
+        <a href="/events" class="nav-link">Explore Events</a>
+      </li>
+
+      <% if (currentUser) { %>
+        <% if (currentUser.role === 'organizer') { %>
+          <li>
+            <a href="/events/new" class="btn btn-primary btn-sm">+ Create Event</a>
+          </li>
+        <% } %>
+
+        <li>
+          <div class="user-badge">
+            <span class="user-name"><%= currentUser.name %></span>
+            <span class="role-pill <%= currentUser.role %>"><%= currentUser.role %></span>
+          </div>
+        </li>
+
+        <li>
+          <form action="/auth/logout" method="POST" style="display: inline;">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+            <button type="submit" class="btn btn-secondary btn-sm">Sign Out</button>
+          </form>
+        </li>
+      <% } else { %>
+        <li>
+          <a href="/auth/login" class="nav-link">Sign In</a>
+        </li>
+        <li>
+          <a href="/auth/register" class="btn btn-primary btn-sm">Get Started</a>
+        </li>
+      <% } %>
+    </ul>
+  </div>
+</nav>
