@@ -9,7 +9,9 @@ async function connectDB(uri) {
 
   try {
     await mongoose.connect(connectionUri, {
-      autoIndex: true
+      dbName: 'eventdesk',
+      autoIndex: true,
+      serverSelectionTimeoutMS: 10000
     });
     console.log(`[EventDesk DB] Connected to MongoDB at ${connectionUri.replace(/\/\/.*@/, '//***@')}`);
     return mongoose.connection;
