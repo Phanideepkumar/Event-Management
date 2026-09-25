@@ -14,6 +14,9 @@ const routes = require('./routes');
 
 const app = express();
 
+// Trust Proxy for Render / Vercel HTTPS reverse proxies
+app.set('trust proxy', 1);
+
 // Ensure DB Connection Middleware (Serverless / Vercel / Render)
 app.use(async (req, res, next) => {
   try {
