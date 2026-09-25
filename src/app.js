@@ -9,9 +9,20 @@ const cookieParser = require('cookie-parser');
 const configurePassport = require('./config/passport');
 const csrfProtection = require('./middleware/csrf');
 const errorHandler = require('./middleware/errorHandler');
+const { connectDB } = require('./config/database');
 const routes = require('./routes');
 
 const app = express();
+
+// Ensure DB Connection Middleware (Serverless / Vercel / Render)
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    next(err);
+  }
+});
 
 // View Engine Setup
 app.set('views', path.join(__dirname, 'views'));
