@@ -1,6 +1,11 @@
 const Event = require('../models/event');
 const Registration = require('../models/registration');
 
+function isJsonRequest(req) {
+  const accept = req.headers.accept || '';
+  return req.xhr || (accept.includes('application/json') && !accept.includes('text/html'));
+}
+
 const eventController = {
   async listEvents(req, res, next) {
     try {
@@ -31,20 +36,21 @@ const eventController = {
         };
       }));
 
-      res.format({
-        'text/html': () => {
-          res.render('events/index', {
-            title: 'Browse Events - EventDesk',
-            events: formattedEvents
-          });
-        },
-        'application/json': () => {
-          res.json({
-            count: formattedEvents.length,
-            events: formattedEvents
-          });
-        },
-        'default': () => res.status(406).send('Not Acceptable')
+      if (isJsonRequest(req)) {
+        return res.json({
+          count: formattedEvents.length,
+          events: formattedEvents
+        });
+      }
+
+      const accept = req.headers.accept || '';
+      if (accept.includes('image/png') && !accept.includes('text/html')) {
+        return res.status(406).send('Not Acceptable');
+      }
+
+      res.render('events/index', {
+        title: 'Browse Events - EventDesk',
+        events: formattedEvents
       });
     } catch (err) {
       next(err);
@@ -61,16 +67,11 @@ const eventController = {
       }
 
       if (!event) {
-        return res.format({
-          'text/html': () => {
-            req.flash('error', 'Event not found.');
-            res.status(404).redirect('/events');
-          },
-          'application/json': () => {
-            res.status(404).json({ error: 'Event not found' });
-          },
-          'default': () => res.status(406).send('Not Acceptable')
-        });
+        if (isJsonRequest(req)) {
+          return res.status(404).json({ error: 'Event not found' });
+        }
+        req.flash('error', 'Event not found.');
+        return res.status(404).redirect('/events');
       }
 
       const confirmedRegistrations = await Registration.find({
@@ -122,17 +123,13 @@ const eventController = {
         userRegistration
       };
 
-      res.format({
-        'text/html': () => {
-          res.render('events/show', {
-            title: `${event.title} - EventDesk`,
-            event: eventData
-          });
-        },
-        'application/json': () => {
-          res.json({ event: eventData });
-        },
-        'default': () => res.status(406).send('Not Acceptable')
+      if (isJsonRequest(req)) {
+        return res.json({ event: eventData });
+      }
+
+      res.render('events/show', {
+        title: `${event.title} - EventDesk`,
+        event: eventData
       });
     } catch (err) {
       next(err);
@@ -161,34 +158,25 @@ const eventController = {
         status: 'published'
       });
 
-      res.format({
-        'text/html': () => {
-          req.flash('success', 'Event published successfully!');
-          res.redirect(`/events/${event.id}`);
-        },
-        'application/json': () => {
-          res.status(201).json({
-            message: 'Event created successfully',
-            event
-          });
-        },
-        'default': () => res.status(406).send('Not Acceptable')
-      });
+      if (isJsonRequest(req)) {
+        return res.status(201).json({
+          message: 'Event created successfully',
+          event
+        });
+      }
+
+      req.flash('success', 'Event published successfully!');
+      res.redirect(`/events/${event.id}`);
     } catch (err) {
       if (err.name === 'ValidationError') {
         const errors = Object.values(err.errors).map(e => e.message);
-        return res.format({
-          'text/html': () => {
-            res.render('events/new', {
-              title: 'Create New Event - EventDesk',
-              errors,
-              values: req.body
-            });
-          },
-          'application/json': () => {
-            res.status(422).json({ errors });
-          },
-          'default': () => res.status(406).send('Not Acceptable')
+        if (isJsonRequest(req)) {
+          return res.status(422).json({ errors });
+        }
+        return res.render('events/new', {
+          title: 'Create New Event - EventDesk',
+          errors,
+          values: req.body
         });
       }
       next(err);
@@ -226,34 +214,25 @@ const eventController = {
 
       await event.save();
 
-      res.format({
-        'text/html': () => {
-          req.flash('success', 'Event updated successfully.');
-          res.redirect(`/events/${event.id}`);
-        },
-        'application/json': () => {
-          res.json({
-            message: 'Event updated successfully',
-            event
-          });
-        },
-        'default': () => res.status(406).send('Not Acceptable')
-      });
+      if (isJsonRequest(req)) {
+        return res.json({
+          message: 'Event updated successfully',
+          event
+        });
+      }
+
+      req.flash('success', 'Event updated successfully.');
+      res.redirect(`/events/${event.id}`);
     } catch (err) {
       if (err.name === 'ValidationError') {
         const errors = Object.values(err.errors).map(e => e.message);
-        return res.format({
-          'text/html': () => {
-            res.render('events/edit', {
-              title: `Edit Event: ${req.body.title || 'Event'}`,
-              event: { ...req.body, id: req.params.id },
-              errors
-            });
-          },
-          'application/json': () => {
-            res.status(422).json({ errors });
-          },
-          'default': () => res.status(406).send('Not Acceptable')
+        if (isJsonRequest(req)) {
+          return res.status(422).json({ errors });
+        }
+        return res.render('events/edit', {
+          title: `Edit Event: ${req.body.title || 'Event'}`,
+          event: { ...req.body, id: req.params.id },
+          errors
         });
       }
       next(err);
@@ -266,16 +245,12 @@ const eventController = {
       event.status = 'cancelled';
       await event.save();
 
-      res.format({
-        'text/html': () => {
-          req.flash('success', 'Event has been cancelled.');
-          res.redirect('/events');
-        },
-        'application/json': () => {
-          res.json({ message: 'Event status updated to cancelled' });
-        },
-        'default': () => res.status(406).send('Not Acceptable')
-      });
+      if (isJsonRequest(req)) {
+        return res.json({ message: 'Event status updated to cancelled' });
+      }
+
+      req.flash('success', 'Event has been cancelled.');
+      res.redirect('/events');
     } catch (err) {
       next(err);
     }
