@@ -14,7 +14,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "db:seed": "node bin/seed-data.js",
-    "prepare": "husky"
+    "prepare": "husky || true"
   },
   "keywords": [
     "express",
